@@ -3,30 +3,30 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { InvoiceCard } from '../../components/ui/InvoiceCard'
-import { projectsData, clientsData, Project, ProjectData } from '../../data/mockData'
 import { StatusType } from '../../types/StatusType'
 import NewInvoiceModal from '../../components/NewInvoiceModal'
 import { useInvoices } from '../../contexts/InvoiceContext'
+import { useProjects } from '../../contexts/ProjectContext'
 
 export default function InvoicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { invoices, addInvoice } = useInvoices()
+  const { projects } = useProjects()
 
-  const handleNewInvoice = (projectId: string, clientId: string, amount: string, status: StatusType, dueDate: string) => {
-    const project = projectsData.find((p) => p.id === projectId)
-    const client = clientsData.find(c => c.id === clientId)
+  const handleNewInvoice = (projectId: string, amount: string, dueDate: string) => {
+    const project = projects.find((p) => p.id === projectId)
     
-    if (project && client) {
-      const newInvoice: ProjectData = {
+    if (project) {
+      const newInvoice = {
         id: Date.now().toString(),
-        status: status,
+        status: StatusType.Pending,
         amount: `$${amount}`,
-        projectName: project.name,
-        clientName: client.name,
+        projectName: project.projectName,
+        clientName: project.clientName,
         totalInvoiced: `$${amount}`,
         invoiceDate: new Date().toISOString().split('T')[0],
         dueDate: dueDate,
-        items: [{ description: project.name, amount: `$${amount}` }]
+        items: [{ description: project.projectName, amount: `$${amount}` }]
       }
       
       addInvoice(newInvoice)
@@ -48,7 +48,7 @@ export default function InvoicesPage() {
       </div>
       {invoices.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {invoices.map((invoice: ProjectData) => (
+          {invoices.map((invoice) => (
             <Link key={invoice.id} href={`/invoices/${invoice.id}`}>
               <InvoiceCard 
                 status={invoice.status}
