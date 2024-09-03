@@ -1,17 +1,39 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ProjectData } from '../../../data/mockData'
 import { StatusType } from '../../../types/StatusType'
 import { useInvoices } from '../../../contexts/InvoiceContext'
 import { useSettings } from '../../../contexts/SettingsContext'
 import { useClients } from '../../../contexts/ClientContext'
-import { ArrowLeft, Edit2, Save, X, Plus } from 'lucide-react'
+import { ArrowLeft, Edit2, Save, X, Plus, FileDown } from 'lucide-react'
+import { usePDF } from 'react-to-pdf'
 
 interface InvoiceItem {
   description: string;
   amount: string;
+}
+
+function StatusBadge({ status }: { status: StatusType }) {
+  const getStatusColor = (status: StatusType) => {
+    switch (status) {
+      case 'Paid':
+        return 'bg-green-100 text-green-800'
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Overdue':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(status)}`}>
+      {status}
+    </span>
+  )
 }
 
 export default function InvoiceDetailsPage({ params }: { params: { id: string } }) {
@@ -23,6 +45,8 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
   const [isEditing, setIsEditing] = useState(false)
   const [editedInvoice, setEditedInvoice] = useState<ProjectData | null>(null)
   const [items, setItems] = useState<InvoiceItem[]>([])
+
+  const { toPDF, targetRef } = usePDF({filename: `invoice-${params.id}.pdf`});
 
   useEffect(() => {
     const foundInvoice = invoices.find(inv => inv.id === params.id)
@@ -106,13 +130,14 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
       >
         <ArrowLeft className="mr-2" size={20} /> Back to Invoices
       </button>
-      <div className="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto">
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold inline-block mr-4">Invoice #{invoice.id}</h1>
+        <StatusBadge status={invoice.status} />
+      </div>
+      <div ref={targetRef} className="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Invoice #{invoice.id}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(invoice.status)}`}>
-              {invoice.status}
-            </span>
           </div>
           <div className="mt-4 md:mt-0 p-4 bg-gray-100 rounded-lg">
             <h2 className="text-xl font-semibold mb-2">{companyDetails.companyName}</h2>
@@ -128,71 +153,23 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-semibold mb-2">Bill To:</h3>
-            {isEditing ? (
-              <select
-                name="clientName"
-                value={editedInvoice.clientName}
-                onChange={handleInputChange}
-                className="w-full border rounded p-2"
-              >
-                <option value="">Select a client</option>
-                {clients.map(client => (
-                  <option key={client.id} value={client.companyName}>{client.companyName}</option>
-                ))}
-              </select>
-            ) : (
-              <>
-                <p className="font-medium">{invoice.clientName}</p>
-                {clients.find(c => c.companyName === invoice.clientName)?.address && (
-                  <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.address}</p>
-                )}
-                {clients.find(c => c.companyName === invoice.clientName)?.email && (
-                  <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.email}</p>
-                )}
-              </>
+            <p className="font-medium">{invoice.clientName}</p>
+            {clients.find(c => c.companyName === invoice.clientName)?.address && (
+              <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.address}</p>
+            )}
+            {clients.find(c => c.companyName === invoice.clientName)?.email && (
+              <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.email}</p>
             )}
           </div>
           <div className="text-right">
             <div className="mb-2">
               <span className="font-semibold">Invoice Date:</span>{' '}
-              {isEditing ? (
-                <input
-                  type="date"
-                  name="invoiceDate"
-                  value={editedInvoice.invoiceDate}
-                  onChange={handleInputChange}
-                  className="border rounded p-2"
-                />
-              ) : (
-                formatDate(invoice.invoiceDate)
-              )}
+              {formatDate(invoice.invoiceDate)}
             </div>
             <div className="mb-2">
               <span className="font-semibold">Due Date:</span>{' '}
-              {isEditing ? (
-                <input
-                  type="date"
-                  name="dueDate"
-                  value={editedInvoice.dueDate}
-                  onChange={handleInputChange}
-                  className="border rounded p-2"
-                />
-              ) : (
-                formatDate(invoice.dueDate)
-              )}
+              {formatDate(invoice.dueDate)}
             </div>
-            {isEditing && (
-              <select
-                name="status"
-                value={editedInvoice.status}
-                onChange={handleInputChange}
-                className="w-full border rounded p-2 mt-2"
-              >
-                {Object.values(StatusType).map(status => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-            )}
           </div>
         </div>
 
@@ -202,47 +179,13 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
               <tr className="bg-gray-100">
                 <th className="text-left py-3 px-4">Description</th>
                 <th className="text-right py-3 px-4">Amount</th>
-                {isEditing && <th className="text-right py-3 px-4">Actions</th>}
               </tr>
             </thead>
             <tbody>
               {items.map((item, index) => (
                 <tr key={index} className="border-b">
-                  <td className="py-3 px-4">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={item.description}
-                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                        className="w-full border rounded p-2"
-                      />
-                    ) : (
-                      item.description
-                    )}
-                  </td>
-                  <td className="text-right py-3 px-4">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={item.amount}
-                        onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
-                        className="w-full border rounded p-2 text-right"
-                        placeholder="0.00"
-                      />
-                    ) : (
-                      item.amount || '$0.00'
-                    )}
-                  </td>
-                  {isEditing && (
-                    <td className="text-right py-3 px-4">
-                      <button
-                        onClick={() => removeItem(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X size={20} />
-                      </button>
-                    </td>
-                  )}
+                  <td className="py-3 px-4">{item.description}</td>
+                  <td className="text-right py-3 px-4">{item.amount}</td>
                 </tr>
               ))}
             </tbody>
@@ -252,16 +195,6 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
                 <td className="text-right py-3 px-4">
                   ${calculateTotal(items)}
                 </td>
-                {isEditing && (
-                  <td className="text-right py-3 px-4">
-                    <button
-                      onClick={addItem}
-                      className="text-blue-500 hover:text-blue-700 flex items-center justify-end w-full"
-                    >
-                      <Plus size={20} className="mr-1" /> Add Item
-                    </button>
-                  </td>
-                )}
               </tr>
             </tfoot>
           </table>
@@ -271,41 +204,48 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
           <h4 className="font-semibold mb-2">Notes:</h4>
           <p className="text-gray-600">Thank you for your business!</p>
         </div>
+      </div>
 
-        <div className="mt-8 flex justify-end space-x-4">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
-              >
-                <Save className="mr-2" size={20} /> Save Changes
-              </button>
-              <button
-                onClick={() => {
-                  setIsEditing(false)
-                  setEditedInvoice(invoice)
-                  setItems([{ description: invoice.projectName, amount: invoice.amount }])
-                }}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center"
-              >
-                <X className="mr-2" size={20} /> Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
-              >
-                <Edit2 className="mr-2" size={20} /> Edit Invoice
-              </button>
-              <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                Mark as Paid
-              </button>
-            </>
-          )}
-        </div>
+      {/* Buttons outside of the targetRef */}
+      <div className="mt-8 flex justify-end space-x-4">
+        {isEditing ? (
+          <>
+            <button
+              onClick={handleSave}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
+            >
+              <Save className="mr-2" size={20} /> Save Changes
+            </button>
+            <button
+              onClick={() => {
+                setIsEditing(false)
+                setEditedInvoice(invoice)
+                setItems([{ description: invoice.projectName, amount: invoice.amount }])
+              }}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 flex items-center"
+            >
+              <X className="mr-2" size={20} /> Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
+            >
+              <Edit2 className="mr-2" size={20} /> Edit Invoice
+            </button>
+            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+              Mark as Paid
+            </button>
+            <button
+              onClick={() => toPDF()}
+              className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 flex items-center"
+            >
+              <FileDown className="mr-2" size={20} /> Export as PDF
+            </button>
+          </>
+        )}
       </div>
     </div>
   )
