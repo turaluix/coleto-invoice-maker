@@ -53,7 +53,6 @@ export default function InvoicesPage() {
               <InvoiceCard 
                 status={invoice.status}
                 amount={invoice.amount}
-                projectName={invoice.projectName}
                 clientName={invoice.clientName}
                 dueDate={invoice.dueDate}
               />
