@@ -55,19 +55,6 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
     setItems(foundInvoice ? [{ description: foundInvoice.projectName, amount: foundInvoice.amount }] : [])
   }, [params.id, invoices])
 
-  const getStatusColor = (status: StatusType) => {
-    switch (status) {
-      case 'Paid':
-        return 'bg-green-100 text-green-800'
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'Overdue':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     if (isNaN(date.getTime())) {
@@ -118,6 +105,10 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
     }
   }
 
+  const getClientDetails = (clientName: string) => {
+    return clients.find(c => c.companyName === clientName);
+  };
+
   if (!invoice || !editedInvoice) {
     return <div>Invoice not found</div>
   }
@@ -136,9 +127,6 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
       </div>
       <div ref={targetRef} className="bg-white shadow-lg rounded-xl p-8 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Invoice #{invoice.id}</h1>
-          </div>
           <div className="mt-4 md:mt-0 p-4 bg-gray-100 rounded-lg">
             <h2 className="text-xl font-semibold mb-2">{companyDetails.companyName}</h2>
             <p className="text-gray-600">{companyDetails.address}</p>
@@ -153,22 +141,61 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-semibold mb-2">Bill To:</h3>
-            <p className="font-medium">{invoice.clientName}</p>
-            {clients.find(c => c.companyName === invoice.clientName)?.address && (
-              <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.address}</p>
-            )}
-            {clients.find(c => c.companyName === invoice.clientName)?.email && (
-              <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.email}</p>
+            {isEditing ? (
+              <select
+                name="clientName"
+                value={editedInvoice.clientName}
+                onChange={handleInputChange}
+                className="w-full border rounded p-2"
+              >
+                {clients.map(client => (
+                  <option key={client.id} value={client.companyName}>{client.companyName}</option>
+                ))}
+              </select>
+            ) : (
+              <>
+                <p className="font-medium">{invoice.clientName}</p>
+                {getClientDetails(invoice.clientName) && (
+                  <>
+                    <p className="text-gray-600">{getClientDetails(invoice.clientName)?.email}</p>
+                    <p className="text-gray-600">{getClientDetails(invoice.clientName)?.address}</p>
+                    {getClientDetails(invoice.clientName)?.vat && (
+                      <p className="text-gray-600">VAT: {getClientDetails(invoice.clientName)?.vat}</p>
+                    )}
+                    <p className="text-gray-600">Phone: {getClientDetails(invoice.clientName)?.phoneNumber}</p>
+                  </>
+                )}
+              </>
             )}
           </div>
           <div className="text-right">
             <div className="mb-2">
               <span className="font-semibold">Invoice Date:</span>{' '}
-              {formatDate(invoice.invoiceDate)}
+              {isEditing ? (
+                <input
+                  type="date"
+                  name="invoiceDate"
+                  value={editedInvoice.invoiceDate}
+                  onChange={handleInputChange}
+                  className="border rounded p-1"
+                />
+              ) : (
+                formatDate(invoice.invoiceDate)
+              )}
             </div>
             <div className="mb-2">
               <span className="font-semibold">Due Date:</span>{' '}
-              {formatDate(invoice.dueDate)}
+              {isEditing ? (
+                <input
+                  type="date"
+                  name="dueDate"
+                  value={editedInvoice.dueDate}
+                  onChange={handleInputChange}
+                  className="border rounded p-1"
+                />
+              ) : (
+                formatDate(invoice.dueDate)
+              )}
             </div>
           </div>
         </div>
@@ -179,13 +206,46 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
               <tr className="bg-gray-100">
                 <th className="text-left py-3 px-4">Description</th>
                 <th className="text-right py-3 px-4">Amount</th>
+                {isEditing && <th className="text-right py-3 px-4">Actions</th>}
               </tr>
             </thead>
             <tbody>
               {items.map((item, index) => (
                 <tr key={index} className="border-b">
-                  <td className="py-3 px-4">{item.description}</td>
-                  <td className="text-right py-3 px-4">{item.amount}</td>
+                  <td className="py-3 px-4">
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={item.description}
+                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                        className="w-full border rounded p-1"
+                      />
+                    ) : (
+                      item.description
+                    )}
+                  </td>
+                  <td className="text-right py-3 px-4">
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={item.amount}
+                        onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
+                        className="w-full border rounded p-1 text-right"
+                      />
+                    ) : (
+                      item.amount
+                    )}
+                  </td>
+                  {isEditing && (
+                    <td className="text-right py-3 px-4">
+                      <button
+                        onClick={() => removeItem(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X size={20} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -195,6 +255,16 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
                 <td className="text-right py-3 px-4">
                   ${calculateTotal(items)}
                 </td>
+                {isEditing && (
+                  <td className="text-right py-3 px-4">
+                    <button
+                      onClick={addItem}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </td>
+                )}
               </tr>
             </tfoot>
           </table>
