@@ -6,6 +6,7 @@ import { invoicesData, ProjectData } from '../data/mockData';
 interface InvoiceContextType {
   invoices: ProjectData[];
   addInvoice: (invoice: ProjectData) => void;
+  updateInvoice: (updatedInvoice: ProjectData) => void;
 }
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
@@ -17,8 +18,16 @@ export function InvoiceProvider({ children }: { children: ReactNode }) {
     setInvoices(prevInvoices => [...prevInvoices, invoice]);
   };
 
+  const updateInvoice = (updatedInvoice: ProjectData) => {
+    setInvoices(prevInvoices => 
+      prevInvoices.map(invoice => 
+        invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+      )
+    );
+  };
+
   return (
-    <InvoiceContext.Provider value={{ invoices, addInvoice }}>
+    <InvoiceContext.Provider value={{ invoices, addInvoice, updateInvoice }}>
       {children}
     </InvoiceContext.Provider>
   );

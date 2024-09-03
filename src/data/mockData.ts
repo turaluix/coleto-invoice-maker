@@ -9,6 +9,7 @@ type ProjectData = {
   totalInvoiced: string;
   invoiceDate: string;
   dueDate: string;
+  items: { description: string; amount: string }[];
 };
 
 export interface Project {
