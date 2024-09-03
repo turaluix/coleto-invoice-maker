@@ -1,45 +1,42 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { InvoiceCard } from '../../components/ui/InvoiceCard'
-import { projectsData, clientsData, Project } from '../../data/mockData'
+import { projectsData, clientsData, Project, ProjectData } from '../../data/mockData'
 import { StatusType } from '../../types/StatusType'
 import NewInvoiceModal from '../../components/NewInvoiceModal'
-
-interface Invoice {
-  id: string
-  status: StatusType
-  amount: string
-  projectName: string
-  clientName: string
-}
+import { useInvoices } from '../../contexts/InvoiceContext'
 
 export default function InvoicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const { invoices, addInvoice } = useInvoices()
 
-  const handleNewInvoice = (projectId: string, clientId: string, amount: string, status: StatusType) => {
+  const handleNewInvoice = (projectId: string, clientId: string, amount: string, status: StatusType, dueDate: string) => {
     const project = projectsData.find((p: Project) => p.id === projectId)
     const client = clientsData.find(c => c.id === clientId)
     
     if (project && client) {
-      const newInvoice: Invoice = {
+      const newInvoice: ProjectData = {
         id: Date.now().toString(),
         status: status,
         amount: `$${amount}`,
         projectName: project.name,
-        clientName: client.name
+        clientName: client.name,
+        totalInvoiced: `$${amount}`,
+        invoiceDate: new Date().toISOString().split('T')[0],
+        dueDate: dueDate
       }
       
-      setInvoices(prevInvoices => [...prevInvoices, newInvoice])
+      addInvoice(newInvoice)
     }
     
     setIsModalOpen(false)
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Invoices</h1>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -50,14 +47,16 @@ export default function InvoicesPage() {
       </div>
       {invoices.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {invoices.map((invoice: Invoice) => (
-            <InvoiceCard 
-              key={invoice.id}
-              status={invoice.status}
-              amount={invoice.amount}
-              projectName={invoice.projectName}
-              clientName={invoice.clientName}
-            />
+          {invoices.map((invoice: ProjectData) => (
+            <Link key={invoice.id} href={`/invoices/${invoice.id}`}>
+              <InvoiceCard 
+                status={invoice.status}
+                amount={invoice.amount}
+                projectName={invoice.projectName}
+                clientName={invoice.clientName}
+                dueDate={invoice.dueDate}
+              />
+            </Link>
           ))}
         </div>
       ) : (

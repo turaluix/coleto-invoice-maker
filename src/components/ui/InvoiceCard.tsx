@@ -6,9 +6,10 @@ interface InvoiceCardProps {
   amount: string
   projectName: string
   clientName: string
+  dueDate: string
 }
 
-export function InvoiceCard({ status, amount, projectName, clientName }: InvoiceCardProps) {
+export function InvoiceCard({ status, amount, projectName, clientName, dueDate }: InvoiceCardProps) {
   const getStatusColor = (status: StatusType) => {
     switch (status) {
       case 'Paid':
@@ -22,8 +23,15 @@ export function InvoiceCard({ status, amount, projectName, clientName }: Invoice
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleDateString();
+  }
+
   return (
-    <div className="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 hover:shadow-xl">
+    <div 
+      className="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 hover:shadow-xl"
+    >
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-800">{projectName}</h3>
         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
@@ -32,6 +40,7 @@ export function InvoiceCard({ status, amount, projectName, clientName }: Invoice
       </div>
       <p className="text-sm text-gray-600 mb-2">{clientName}</p>
       <p className="text-2xl font-bold text-gray-900">{amount}</p>
+      <p className="text-sm text-gray-600 mt-2">Due: {formatDate(dueDate)}</p>
     </div>
   )
 }

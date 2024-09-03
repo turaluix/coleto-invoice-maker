@@ -8,7 +8,7 @@ import { StatusType } from '../types/StatusType'
 interface NewInvoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (projectId: string, clientId: string, amount: string, status: StatusType) => void;
+  onSubmit: (projectId: string, clientId: string, amount: string, status: StatusType, dueDate: string) => void;
 }
 
 export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoiceModalProps) {
@@ -16,6 +16,7 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
   const [selectedClient, setSelectedClient] = useState('')
   const [amount, setAmount] = useState('')
   const [status, setStatus] = useState<StatusType>(StatusType.Pending)
+  const [dueDate, setDueDate] = useState('')
 
   console.log('projectsData:', projectsData); // Add this line for debugging
 
@@ -32,11 +33,12 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
         </div>
         <form onSubmit={(e) => {
           e.preventDefault();
-          onSubmit(selectedProject, selectedClient, amount, status);
+          onSubmit(selectedProject, selectedClient, amount, status, dueDate);
           setSelectedProject('');
           setSelectedClient('');
           setAmount('');
           setStatus(StatusType.Pending);
+          setDueDate('');
         }}>
           <div className="mb-4">
             <label htmlFor="project" className="block text-sm font-medium text-gray-700 mb-1">
@@ -106,6 +108,19 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
                 </option>
               ))}
             </select>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="dueDate"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            />
           </div>
           <button
             type="submit"
