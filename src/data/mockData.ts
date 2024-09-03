@@ -1,16 +1,18 @@
 import { StatusType } from '../types/StatusType'
 
-export interface ProjectData {
-  id: string
-  projectName: string
-  totalInvoiced: string
-  clientName: string
-  status: StatusType
-}
+type ProjectData = {
+  id: string;
+  status: StatusType;
+  amount: string;
+  projectName: string;
+  clientName: string;
+  totalInvoiced: string;
+  // Add other properties as needed
+};
 
 export interface Project {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 export const projectsData: Project[] = [

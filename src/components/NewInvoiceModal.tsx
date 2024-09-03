@@ -17,6 +17,8 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
   const [amount, setAmount] = useState('')
   const [status, setStatus] = useState<StatusType>(StatusType.Pending)
 
+  console.log('projectsData:', projectsData); // Add this line for debugging
+
   if (!isOpen) return null;
 
   return (
