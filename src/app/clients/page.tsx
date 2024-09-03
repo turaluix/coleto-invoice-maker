@@ -3,26 +3,14 @@
 import { useState } from 'react'
 import ClientCard from '../../components/ui/ClientCard'
 import NewClientModal from '../../components/NewClientModal'
-
-interface Client {
-  id: string;
-  companyName: string;
-  email: string;
-  address: string;
-  vat?: string;
-  phoneNumber: string;
-}
+import { useClients, Client } from '../../contexts/ClientContext'
 
 export default function ClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [clients, setClients] = useState<Client[]>([])
+  const { clients, addClient } = useClients()
 
   const handleNewClient = (clientData: Omit<Client, 'id'>) => {
-    const newClient: Client = {
-      id: Date.now().toString(),
-      ...clientData
-    }
-    setClients(prevClients => [...prevClients, newClient])
+    addClient(clientData)
     setIsModalOpen(false)
   }
 

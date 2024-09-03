@@ -4,6 +4,8 @@ import "./globals.css";
 import { Sidebar } from '@/components/Sidebar';
 import { InvoiceProvider } from '../contexts/InvoiceContext';
 import { SettingsProvider } from '../contexts/SettingsContext';
+import { ClientProvider } from '../contexts/ClientContext';
+import { ProjectProvider } from '../contexts/ProjectContext';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,12 +20,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <SettingsProvider>
           <InvoiceProvider>
-            <div className="flex flex-col lg:flex-row min-h-screen">
-              <Sidebar />
-              <main className="flex-1 p-4 lg:p-8">
-                {children}
-              </main>
-            </div>
+            <ClientProvider>
+              <ProjectProvider>
+                <div className="flex flex-col lg:flex-row min-h-screen">
+                  <Sidebar />
+                  <main className="flex-1 p-4 lg:p-8">
+                    {children}
+                  </main>
+                </div>
+              </ProjectProvider>
+            </ClientProvider>
           </InvoiceProvider>
         </SettingsProvider>
       </body>

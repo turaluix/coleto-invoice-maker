@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { ProjectData, clientsData } from '../../../data/mockData'
+import { ProjectData } from '../../../data/mockData'
 import { StatusType } from '../../../types/StatusType'
 import { useInvoices } from '../../../contexts/InvoiceContext'
 import { useSettings } from '../../../contexts/SettingsContext'
+import { useClients } from '../../../contexts/ClientContext'
 import { ArrowLeft, Edit2, Save, X, Plus } from 'lucide-react'
 
 interface InvoiceItem {
@@ -17,6 +18,7 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
   const router = useRouter()
   const { invoices, updateInvoice } = useInvoices()
   const { companyDetails } = useSettings()
+  const { clients } = useClients()
   const [invoice, setInvoice] = useState<ProjectData | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editedInvoice, setEditedInvoice] = useState<ProjectData | null>(null)
@@ -133,15 +135,22 @@ export default function InvoiceDetailsPage({ params }: { params: { id: string } 
                 onChange={handleInputChange}
                 className="w-full border rounded p-2"
               >
-                {clientsData.map(client => (
-                  <option key={client.id} value={client.name}>{client.name}</option>
+                <option value="">Select a client</option>
+                {clients.map(client => (
+                  <option key={client.id} value={client.companyName}>{client.companyName}</option>
                 ))}
               </select>
             ) : (
-              <p className="font-medium">{invoice.clientName}</p>
+              <>
+                <p className="font-medium">{invoice.clientName}</p>
+                {clients.find(c => c.companyName === invoice.clientName)?.address && (
+                  <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.address}</p>
+                )}
+                {clients.find(c => c.companyName === invoice.clientName)?.email && (
+                  <p className="text-gray-600">{clients.find(c => c.companyName === invoice.clientName)?.email}</p>
+                )}
+              </>
             )}
-            <p className="text-gray-600">Client Address</p>
-            <p className="text-gray-600">Client City, State 54321</p>
           </div>
           <div className="text-right">
             <div className="mb-2">

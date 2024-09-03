@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import { projectsData, clientsData, Project } from '../data/mockData'
 import { StatusType } from '../types/StatusType'
+import { useClients } from '../contexts/ClientContext'
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface NewInvoiceModalProps {
 }
 
 export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoiceModalProps) {
+  const { clients } = useClients();
   const [selectedProject, setSelectedProject] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [amount, setAmount] = useState('')
@@ -71,9 +73,9 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
               required
             >
               <option value="">Select a client</option>
-              {clientsData.map((client) => (
+              {clients.map((client) => (
                 <option key={client.id} value={client.id}>
-                  {client.name}
+                  {client.companyName}
                 </option>
               ))}
             </select>

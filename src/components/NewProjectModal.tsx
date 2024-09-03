@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useClients } from '../contexts/ClientContext';
 import { X } from 'lucide-react';
-import { clientsData } from '../data/mockData';
 
 interface NewProjectModalProps {
   isOpen: boolean;
@@ -11,10 +11,21 @@ interface NewProjectModalProps {
 }
 
 export function NewProjectModal({ isOpen, onClose, onSubmit }: NewProjectModalProps) {
+  const { clients } = useClients();
   const [projectName, setProjectName] = useState('');
   const [selectedClient, setSelectedClient] = useState('');
 
   if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (projectName && selectedClient) {
+      onSubmit(projectName, selectedClient);
+      setProjectName('');
+      setSelectedClient('');
+      onClose();
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center h-screen z-50">
@@ -25,13 +36,7 @@ export function NewProjectModal({ isOpen, onClose, onSubmit }: NewProjectModalPr
             <X size={24} />
           </button>
         </div>
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          onSubmit(projectName, selectedClient);
-          setProjectName('');
-          setSelectedClient('');
-          onClose();
-        }}>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="projectName" className="block text-sm font-medium text-gray-700 mb-1">
               Project Name
@@ -57,9 +62,9 @@ export function NewProjectModal({ isOpen, onClose, onSubmit }: NewProjectModalPr
               required
             >
               <option value="">Select a client</option>
-              {clientsData.map((client) => (
+              {clients.map((client) => (
                 <option key={client.id} value={client.id}>
-                  {client.name}
+                  {client.companyName}
                 </option>
               ))}
             </select>

@@ -3,30 +3,24 @@
 import { useState } from 'react';
 import { ProjectCard } from '../../components/ui/ProjectCard'
 import { NewProjectModal } from '../../components/NewProjectModal'
-import { clientsData } from '../../data/mockData'
-
-interface Project {
-  id: string;
-  projectName: string;
-  totalInvoiced: string;
-  clientName: string;
-}
+import { useProjects, Project } from '../../contexts/ProjectContext'
+import { useClients } from '../../contexts/ClientContext'
 
 export default function ProjectsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { projects, addProject } = useProjects();
+  const { clients } = useClients();
 
   const handleNewProject = (projectName: string, clientId: string) => {
-    const client = clientsData.find(c => c.id === clientId);
-    const clientName = client ? client.name : 'Unknown Client';
+    const client = clients.find(c => c.id === clientId);
+    const clientName = client ? client.companyName : 'Unknown Client';
 
-    const newProject: Project = {
-      id: Date.now().toString(),
+    const newProject: Omit<Project, 'id'> = {
       projectName,
       totalInvoiced: '$0',
       clientName: clientName,
     };
-    setProjects(prevProjects => [...prevProjects, newProject]);
+    addProject(newProject);
     setIsModalOpen(false);
   };
 
@@ -46,10 +40,7 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <ProjectCard
               key={project.id}
-              id={project.id}
-              projectName={project.projectName}
-              totalInvoiced={project.totalInvoiced}
-              clientName={project.clientName}
+              {...project}
             />
           ))}
         </div>
