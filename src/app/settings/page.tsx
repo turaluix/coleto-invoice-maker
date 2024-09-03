@@ -24,7 +24,7 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-3 px-3 py-2 w-full text-left rounded-lg transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'bg-white text-black shadow-md'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -50,30 +50,30 @@ function PersonalInfoSettings() {
       <h2 className="text-2xl font-semibold">Personal Information</h2>
       <form className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
             Full Name
           </label>
           <input
             type="text"
             id="name"
             name="name"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
             Email Address
           </label>
           <input
             type="email"
             id="email"
             name="email"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           Save Changes
         </button>
@@ -118,41 +118,41 @@ function AccountSettings() {
       <h2 className="text-2xl font-semibold">Account Settings</h2>
       <form className="space-y-4">
         <div>
-          <label htmlFor="current-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">
             Current Password
           </label>
           <input
             type="password"
             id="current-password"
             name="current-password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div>
-          <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
             New Password
           </label>
           <input
             type="password"
             id="new-password"
             name="new-password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
             Confirm New Password
           </label>
           <input
             type="password"
             id="confirm-password"
             name="confirm-password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           Update Password
         </button>

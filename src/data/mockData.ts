@@ -3,34 +3,22 @@ export interface ProjectData {
   projectName: string
   totalInvoiced: string
   clientName: string
+  status?: StatusType // Add this if it's not already there
 }
 
-export const projectsData: ProjectData[] = [
-  {
-    id: '1',
-    projectName: 'Logo Design',
-    totalInvoiced: '$5,000',
-    clientName: 'TechStart Inc.'
-  },
-  {
-    id: '2',
-    projectName: 'Website Redesign',
-    totalInvoiced: '$10,000',
-    clientName: 'Acme Corporation'
-  },
-  {
-    id: '3',
-    projectName: 'Mobile App Development',
-    totalInvoiced: '$15,000',
-    clientName: 'Global Solutions Ltd.'
-  },
-  {
-    id: '4',
-    projectName: 'Brand Identity',
-    totalInvoiced: '$7,500',
-    clientName: 'Innovative Startups Co.'
-  }
-]
+export interface Project {
+  id: string
+  name: string
+}
+
+export const projectsData: Project[] = [
+  { id: '1', name: 'Logo Design' },
+  { id: '2', name: 'Website Redesign' },
+  // Add more projects as needed
+];
+
+// Make sure there's no default export that might be interfering
+// export default { ... }  // Remove or comment out if present
 
 export const invoicesData: ProjectData[] = [
   {
