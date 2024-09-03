@@ -1,6 +1,6 @@
 import { StatusType } from '../types/StatusType'
 
-type ProjectData = {
+export type ProjectData = {
   id: string;
   status: StatusType;
   amount: string;

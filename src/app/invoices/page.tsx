@@ -13,7 +13,7 @@ export default function InvoicesPage() {
   const { invoices, addInvoice } = useInvoices()
 
   const handleNewInvoice = (projectId: string, clientId: string, amount: string, status: StatusType, dueDate: string) => {
-    const project = projectsData.find((p: Project) => p.id === projectId)
+    const project = projectsData.find((p) => p.id === projectId)
     const client = clientsData.find(c => c.id === clientId)
     
     if (project && client) {
@@ -25,7 +25,8 @@ export default function InvoicesPage() {
         clientName: client.name,
         totalInvoiced: `$${amount}`,
         invoiceDate: new Date().toISOString().split('T')[0],
-        dueDate: dueDate
+        dueDate: dueDate,
+        items: [{ description: project.name, amount: `$${amount}` }]
       }
       
       addInvoice(newInvoice)
