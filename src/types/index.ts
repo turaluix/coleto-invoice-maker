@@ -1,1 +1,1 @@
-export type StatusType = 'Sent' | 'Viewed' | 'Paid';
+export { StatusType } from './StatusType'

@@ -1,9 +1,11 @@
+import { StatusType } from '../types/StatusType'
+
 export interface ProjectData {
   id: string
   projectName: string
   totalInvoiced: string
   clientName: string
-  status?: StatusType // Add this if it's not already there
+  status: StatusType
 }
 
 export interface Project {
@@ -22,16 +24,20 @@ export const projectsData: Project[] = [
 
 export const invoicesData: ProjectData[] = [
   {
-    status: 'Sent',
+    id: '1',
+    status: StatusType.Pending,
     amount: '$5,000',
     projectName: 'Logo Design',
-    clientName: 'TechStart Inc.'
+    clientName: 'TechStart Inc.',
+    totalInvoiced: '$5,000'
   },
   {
-    status: 'Viewed',
+    id: '2',
+    status: StatusType.Paid,
     amount: '$10,000',
     projectName: 'Website Redesign',
-    clientName: 'Acme Corporation'
+    clientName: 'Acme Corporation',
+    totalInvoiced: '$10,000'
   },
   // ... more invoice data ...
 ];

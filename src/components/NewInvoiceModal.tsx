@@ -3,17 +3,19 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { projectsData, clientsData, Project } from '../data/mockData'
+import { StatusType } from '../types/StatusType'
 
 interface NewInvoiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (projectId: string, clientId: string, amount: string) => void;
+  onSubmit: (projectId: string, clientId: string, amount: string, status: StatusType) => void;
 }
 
 export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoiceModalProps) {
   const [selectedProject, setSelectedProject] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [amount, setAmount] = useState('')
+  const [status, setStatus] = useState<StatusType>(StatusType.Pending)
 
   if (!isOpen) return null;
 
@@ -28,10 +30,11 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
         </div>
         <form onSubmit={(e) => {
           e.preventDefault();
-          onSubmit(selectedProject, selectedClient, amount);
+          onSubmit(selectedProject, selectedClient, amount, status);
           setSelectedProject('');
           setSelectedClient('');
           setAmount('');
+          setStatus(StatusType.Pending);
         }}>
           <div className="mb-4">
             <label htmlFor="project" className="block text-sm font-medium text-gray-700 mb-1">
@@ -83,6 +86,24 @@ export default function NewInvoiceModal({ isOpen, onClose, onSubmit }: NewInvoic
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as StatusType)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            >
+              {Object.values(StatusType).map((statusOption) => (
+                <option key={statusOption} value={statusOption}>
+                  {statusOption}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"

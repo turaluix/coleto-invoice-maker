@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { InvoiceCard } from '../../components/ui/InvoiceCard'
 import { projectsData, clientsData, Project } from '../../data/mockData'
-import { StatusType } from '../../types'
+import { StatusType } from '../../types/StatusType'
 import NewInvoiceModal from '../../components/NewInvoiceModal'
 
 interface Invoice {
@@ -18,14 +18,14 @@ export default function InvoicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [invoices, setInvoices] = useState<Invoice[]>([])
 
-  const handleNewInvoice = (projectId: string, clientId: string, amount: string) => {
+  const handleNewInvoice = (projectId: string, clientId: string, amount: string, status: StatusType) => {
     const project = projectsData.find((p: Project) => p.id === projectId)
     const client = clientsData.find(c => c.id === clientId)
     
     if (project && client) {
       const newInvoice: Invoice = {
         id: Date.now().toString(),
-        status: 'Pending',
+        status: status,
         amount: `$${amount}`,
         projectName: project.name,
         clientName: client.name

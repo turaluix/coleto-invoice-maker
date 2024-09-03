@@ -1,47 +1,37 @@
-import { StatusType } from '../../types'
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import React from 'react'
+import { StatusType } from '../../types/StatusType'
 
-interface InvoiceCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface InvoiceCardProps {
   status: StatusType
   amount: string
   projectName: string
   clientName: string
 }
 
-const statusStyles: Record<StatusType, string> = {
-  Sent: "bg-blue-100 text-blue-800",
-  Viewed: "bg-yellow-100 text-yellow-800",
-  Paid: "bg-green-100 text-green-800"
-}
+export function InvoiceCard({ status, amount, projectName, clientName }: InvoiceCardProps) {
+  const getStatusColor = (status: StatusType) => {
+    switch (status) {
+      case 'Paid':
+        return 'bg-green-100 text-green-800'
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Overdue':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
 
-const InvoiceCard = React.forwardRef<HTMLDivElement, InvoiceCardProps>(
-  ({ className, status, amount, projectName, clientName, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-lg p-6 space-y-4",
-        className
-      )}
-      {...props}
-    >
-      <div className="flex justify-between items-center">
-        <span className="text-3xl font-bold">{amount}</span>
-        <span className={cn("px-2 py-1 rounded-full text-xs font-medium", statusStyles[status])}>{status}</span>
+  return (
+    <div className="bg-white shadow-lg rounded-xl p-6 transition-all duration-300 hover:shadow-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold text-gray-800">{projectName}</h3>
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
+          {status}
+        </span>
       </div>
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Project:</span>
-          <span className="font-medium">{projectName}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">Client:</span>
-          <span className="font-medium">{clientName}</span>
-        </div>
-      </div>
+      <p className="text-sm text-gray-600 mb-2">{clientName}</p>
+      <p className="text-2xl font-bold text-gray-900">{amount}</p>
     </div>
   )
-)
-InvoiceCard.displayName = "InvoiceCard"
-
-export { InvoiceCard }
+}
